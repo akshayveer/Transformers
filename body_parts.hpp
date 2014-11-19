@@ -1,4 +1,7 @@
 #include "gl_framework.hpp"
+#include <stdio.h>
+#include <stdlib.h>
+
 #define cube 1
 #define pelvis 2
 #define leg 3
@@ -9,6 +12,14 @@
 #define foot 8
 #define left_prism 9
 #define right_prism 10
+#define front_left_window 11
+#define left_bonnet 12
+#define right_bonnet 13
+#define left_hood 14
+#define right_hood 15
+#define front_right_window 16
+#define head 17
+#define ground 18
 
 void struct_cube(void);
 void struct_pelvis(void);
@@ -20,6 +31,15 @@ void struct_wheel(void);
 void struct_foot(void);
 void struct_left_prism(void);
 void struct_right_prism(void);
+GLuint LoadTexture(const char * pic);
+void struct_front_left_window(void);
+void struct_front_right_window(void);
+void struct_left_bonnet(void);
+void struct_right_bonnet(void);
+void struct_left_hood(void);
+void struct_right_hood(void);
+void struct_head(void);
+void struct_ground(void);
 
  static GLUquadricObj *quadratic=gluNewQuadric();
  // dimestion x,y,z
@@ -32,7 +52,12 @@ void struct_right_prism(void);
  extern float prism_height;
  extern float torso_dim[3];
  extern float prism_angle;
- extern float hand_gap;       // hand into body
+ extern float panel_gap;       
  extern float hand_length;
  extern float hand_dim[3];
+ extern float foot_length;
+ extern float foot_height;
+ extern float texture_shift;
+ extern float window_shift;
+ extern float x,y,z;
  
