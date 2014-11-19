@@ -7,9 +7,9 @@
 
 #include <iostream>
 #include <math.h>
+#include <fstream>
 
-
-
+using namespace std;
 
 namespace cs475
 {
@@ -27,9 +27,8 @@ namespace cs475
 
   void copy(float* src,float*dst);
 
-  void mulMatrix(GLfloat* matrix);
+  void loadCurrentCamera();
 
-  bool gluInvertMatrix(GLfloat* m, GLfloat* invOut);
 
 
 	extern float hand_angle;
@@ -69,6 +68,14 @@ namespace cs475
 	extern float forward;
 	extern float car_angle;
 	extern float tyre_angle;
+	extern float transformer_position[3];
+	extern bool transform;
+	extern bool playback;
+	extern ofstream myfile;
+	extern bool vehicle_mode;
+	extern bool record;
+	extern float move_foot;
+	extern float head_angle;
 };
 
 

@@ -20,6 +20,8 @@
 #define front_right_window 16
 #define head 17
 #define ground 18
+#define objects 19
+#define hand_texture 20
 
 void struct_cube(void);
 void struct_pelvis(void);
@@ -40,6 +42,8 @@ void struct_left_hood(void);
 void struct_right_hood(void);
 void struct_head(void);
 void struct_ground(void);
+void struct_objects(void);
+void struct_hand_texture(void);
 
  static GLUquadricObj *quadratic=gluNewQuadric();
  // dimestion x,y,z

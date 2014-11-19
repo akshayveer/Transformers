@@ -2,7 +2,7 @@
 
 float pelvis_dim[3]={0.35,0.15,0.15};
 float thigh_space=0.1;
-float thigh_dim[3]={(pelvis_dim[0]-thigh_space)/2,0.2,0.1};
+float thigh_dim[3]={(pelvis_dim[0]-thigh_space)/2,0.25,0.1};
 float leg_dim[3]={pelvis_dim[0]/2,0*thigh_dim[2]+thigh_dim[1]+pelvis_dim[1],pelvis_dim[2]};
 float thigh_leg_space=(leg_dim[0]-thigh_dim[0])/2;
 float torso_gap=0.01;
@@ -51,7 +51,7 @@ GLuint LoadTexture(const char * pic)
 void struct_front_left_window(void){
 	glNewList(front_left_window,GL_COMPILE);
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			GLuint myTex  = LoadTexture("./images/BG.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 			glPushMatrix();
@@ -70,7 +70,7 @@ void struct_front_left_window(void){
 void struct_front_right_window(void){
 	glNewList(front_right_window,GL_COMPILE);
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			GLuint myTex  = LoadTexture("./images/BG.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 			glPushMatrix();
@@ -89,7 +89,7 @@ void struct_front_right_window(void){
 void struct_left_bonnet(void){
 	glNewList(left_bonnet,GL_COMPILE);
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			GLuint myTex  = LoadTexture("./images/front.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 			glPushMatrix();
@@ -106,7 +106,7 @@ void struct_left_bonnet(void){
 void struct_right_bonnet(void){
 	glNewList(right_bonnet,GL_COMPILE);
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			GLuint myTex  = LoadTexture("./images/front.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 			glPushMatrix();
@@ -126,7 +126,7 @@ void struct_left_hood(void){
 	GLuint myTex;
 	glNewList(left_hood,GL_COMPILE);
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			myTex  = LoadTexture("./images/left.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 		        glBegin(GL_QUADS);
@@ -138,7 +138,7 @@ void struct_left_hood(void){
 		glDisable(GL_TEXTURE_2D);
 
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			myTex  = LoadTexture("./images/test.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 				glBegin(GL_QUADS);
@@ -156,7 +156,7 @@ void struct_right_hood(void){
 	glNewList(right_hood,GL_COMPILE);
 		GLuint myTex;
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			myTex  = LoadTexture("./images/right.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 		        glBegin(GL_QUADS);
@@ -168,7 +168,7 @@ void struct_right_hood(void){
 		glDisable(GL_TEXTURE_2D);
 
 		glEnable(GL_TEXTURE_2D);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			myTex  = LoadTexture("./images/test.bmp");
 			glBindTexture(GL_TEXTURE_2D, myTex);
 				glBegin(GL_QUADS);
@@ -252,7 +252,7 @@ void struct_pelvis(void){
 	glScalef(pelvis_dim[0],pelvis_dim[1],pelvis_dim[2]);
 
 	glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		GLuint myTex  = LoadTexture("./images/4.bmp");
 		glBindTexture(GL_TEXTURE_2D, myTex);
 		glBegin(GL_QUADS);
@@ -275,7 +275,7 @@ void struct_thigh(void){
 	glTranslatef(0,-thigh_dim[1],0);
 	glScalef(thigh_dim[0],thigh_dim[1],thigh_dim[2]);
 	glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		GLuint myTex  = LoadTexture("./images/leg.bmp");
 		glBindTexture(GL_TEXTURE_2D, myTex);
 		glBegin(GL_QUADS);
@@ -318,7 +318,7 @@ void struct_leg(void){
 	glScalef(leg_dim[0],leg_dim[1],leg_dim[2]);
 
 	glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		GLuint myTex  = LoadTexture("./images/hood2.bmp");
 		glBindTexture(GL_TEXTURE_2D, myTex);
 
@@ -350,7 +350,7 @@ void struct_body(void){
 	glTranslatef(torso_gap/2,pelvis_dim[1],0);
 	glScalef(torso_dim[0],torso_dim[1],torso_dim[2]);
 	glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		myTex  = LoadTexture("./images/hood2.bmp");
 		glBindTexture(GL_TEXTURE_2D, myTex);
 		glPushMatrix();
@@ -376,7 +376,7 @@ void struct_body(void){
 	glDisable(GL_TEXTURE_2D);
 
 	glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		myTex  = LoadTexture("./images/1.bmp");
 		glBindTexture(GL_TEXTURE_2D, myTex);
 		glBegin(GL_QUADS);
@@ -416,7 +416,7 @@ void struct_wheel(void){
     gluDisk(quadratic,0,1,32,32);
 
 	glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		GLuint myTex  = LoadTexture("./images/wheel.bmp");
 		glBindTexture(GL_TEXTURE_2D, myTex);
 		glPushMatrix();
@@ -566,7 +566,7 @@ void struct_head(void){
         glScalef(0.15,0.15,torso_dim[2]);
 
     glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		GLuint myTex  = LoadTexture("./images/3.bmp");
 		glBindTexture(GL_TEXTURE_2D, myTex);
 		glPushMatrix();
@@ -593,7 +593,7 @@ void struct_ground(void){
 		float w=1000,h=1000;
 			// glColor3f(0,1,0);	
 		glEnable(GL_TEXTURE_2D);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 				myTex  = LoadTexture("./images/road.bmp");
 				glBindTexture(GL_TEXTURE_2D, myTex);
 		   	glBegin(GL_QUADS);
@@ -607,7 +607,7 @@ void struct_ground(void){
 		glPushMatrix();
 			// glScalef(1000,1000,1000);	
 			glEnable(GL_TEXTURE_2D);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 				myTex  = LoadTexture("./images/image.bmp");
 				glBindTexture(GL_TEXTURE_2D, myTex);
 
@@ -618,6 +618,8 @@ void struct_ground(void){
 					glTexCoord2f(0, 1); glVertex3f(-w,h,-w);
 					glTexCoord2f(0, 0); glVertex3f(-w,0,-w);
 				glEnd();
+
+				
 
 				glBegin(GL_QUADS);
 					glTexCoord2f(0, 0); glVertex3f(w,0,-w);
@@ -651,5 +653,71 @@ void struct_ground(void){
 
 			glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
+	glEndList();
+}
+
+void struct_objects(){
+	glNewList(objects,GL_COMPILE);
+		glColor3f(1,0,0);
+		glCallList(cube);
+	glEndList();
+}
+
+void struct_hand_texture(){
+	GLuint myTex; 
+	glNewList(hand_texture,GL_COMPILE);
+		glEnable(GL_TEXTURE_2D);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+				 myTex= LoadTexture("./images/hand.bmp");
+				glBindTexture(GL_TEXTURE_2D, myTex);
+								// front face
+					// glColor3f( 1.0, 0.0, 0.0); 
+					glBegin(GL_POLYGON);
+					glTexCoord2f(0, 0) ;glVertex3f(0,0,0+texture_shift);
+					glTexCoord2f(1, 0); glVertex3f(1,0,0+texture_shift);
+					glTexCoord2f(1, 1); glVertex3f(1,1,0+texture_shift);
+					glTexCoord2f(0, 1); glVertex3f(0,1,0+texture_shift);
+					glEnd();
+
+					// right face
+					// glColor3f(0.0, 1.0, 0.0); 
+					glBegin(GL_POLYGON);
+					glTexCoord2f(0, 0); glVertex3f(1+texture_shift,0,0);
+					glTexCoord2f(1, 0); glVertex3f(1+texture_shift,0,-1);
+					glTexCoord2f(1, 1); glVertex3f(1+texture_shift,1,-1);
+					glTexCoord2f(0, 1); glVertex3f(1+texture_shift,1,0);
+					glEnd();
+
+					// back face
+					// glColor3f( 0.0, 0.0, 1.0); 
+					glBegin(GL_POLYGON);
+					glTexCoord2f(0, 0); glVertex3f(1,0,-1-texture_shift);
+					glTexCoord2f(1, 0); glVertex3f(0,0,-1-texture_shift);
+					glTexCoord2f(1, 1); glVertex3f(0,1,-1-texture_shift);
+					glTexCoord2f(0, 1); glVertex3f(1,1,-1-texture_shift);
+					
+					glEnd();
+
+					// left face
+					// glColor3f( 1.0, 1.0, 0.0); 
+					glBegin(GL_POLYGON);
+					glTexCoord2f(0, 0); glVertex3f(0-texture_shift,0,-1);
+					glTexCoord2f(1, 0); glVertex3f(0-texture_shift,0,0);
+					glTexCoord2f(1, 1); glVertex3f(0-texture_shift,1,0);
+					glTexCoord2f(0, 1); glVertex3f(0-texture_shift,1,-1);
+					glEnd();
+			glDisable(GL_TEXTURE_2D);
+
+			glEnable(GL_TEXTURE_2D);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+				myTex  = LoadTexture("./images/gun1.bmp");
+				glBindTexture(GL_TEXTURE_2D, myTex);
+				glBegin(GL_POLYGON);
+				glTexCoord2f(0, 0); glVertex3f(0,0-window_shift,0);
+				glTexCoord2f(1, 0); glVertex3f(0,0-window_shift,-1);
+				glTexCoord2f(1, 1); glVertex3f(1,0-window_shift,-1);
+				glTexCoord2f(0, 1); glVertex3f(1,0-window_shift,0);
+				glEnd();
+			glDisable(GL_TEXTURE_2D);
 	glEndList();
 }

@@ -8,7 +8,7 @@ namespace cs475{
 	float right_knee_angle=0;
 	float left_knee_angle=0;
 	bool toCar=false;
-	bool toTransformer=false;
+	bool toTransformer=true;
 	float leg_shift=0;
 	float step=5;  // 0.09
 	float left_hip_angle=0;
@@ -33,16 +33,19 @@ namespace cs475{
 	float x=0.0f,y=0,z=0.0f;
 	float lx=0.0f,ly=0.0f,lz=0.0f;
 
-	float cam_angle;
-	float cam1_pos[9]={0,10,20,0,10,19,0,1,0};
-	float cam2_pos[9]={0,2,1,0,2,0,0,1,0};
-	float cam3_pos[9]={0.35/2,2,-2,0.35/2,2,0,0,1,0};
+	float transformer_position[3]={-367.761,0,854.055};
+	float cam_angle=0;
+	float cam2_z=30;
+	float cam3_z=3;
+	float cam1_pos[9]={-367.761,10,50+854.055,-367.761,10,10+854.055,0,1,0};
+	float cam2_pos[9]={10*0.35/2,10,-cam2_z,10*0.35/2,10,0,0,1,0};
+	float cam3_pos[9]={10*0.35/2,0,3,10*0.35/2,0,4,0,1,0};
 	float current_cam_pos[9];
 	int cam_num=1;
 
-	float forward=0;
+	float forward=0.0;
 	float tyre_angle=0;
-	float direction=1;
+	bool transform=false;
 
 	GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
 	GLfloat lightDiff[] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -57,7 +60,7 @@ namespace cs475{
 
 	GLfloat spot_light_diffuse[]={0.4, 0.4, 0.4, 1.0};
 	GLfloat spot_light_specular[]={1.0, 1.0, 1.0, 1.0};
-	GLfloat spot_light_direction[]={0.0, -1.0, 0.0};
+	GLfloat spot_light_direction[]={0.0, 1.0, 0.0};
 
 	GLfloat spot_light_position2[]={1-0.732051,1+0.1,-1};
 	GLfloat spot_light_position1[]={0.732051,1+0.1,-1};
@@ -68,7 +71,17 @@ namespace cs475{
 	bool spot_light1=true;
 	bool spot_light2=true;
 
+	bool record=false;
+	bool playback=false;
+
+	ofstream myfile;
+  	bool vehicle_mode=false;
+
+  	float move_foot=0;
+  	float head_angle=0;
+
 void initGL(void){
+
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0);
 	glEnable(GL_CULL_FACE);
@@ -82,11 +95,9 @@ void initGL(void){
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
-	glEnable(GL_LIGHT2);
-	glEnable(GL_LIGHT3);
-
 	glShadeModel(GL_SMOOTH);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+
 
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpec);
@@ -105,194 +116,39 @@ void initGL(void){
 	glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, spot_light_direction);
 	glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 5.0);
 	glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, 25.0);
-	
+	glEnable(GL_LIGHT2);
 
 	glLightfv(GL_LIGHT3, GL_SPECULAR, spot_light_specular);
 	glLightfv(GL_LIGHT3, GL_POSITION, spot_light_position2);
 	glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spot_light_direction);
 	glLightf(GL_LIGHT3, GL_LINEAR_ATTENUATION, 5.0);
 	glLightf(GL_LIGHT3, GL_SPOT_CUTOFF, 25.0);
+	glEnable(GL_LIGHT3);
+
+	myfile.open ("keyframes.txt");
+}
+
+
+void loadCurrentCamera(){
 	
+	cam2_pos[0]=transformer_position[0]+(0.35*5*cos(car_angle*M_PI/180))-cam2_z*sin(car_angle*M_PI/180);
+	cam2_pos[2]=transformer_position[2]+(0.35*5*sin(car_angle*M_PI/180))-cam2_z*cos(car_angle*M_PI/180);
+	cam2_pos[3]=transformer_position[0]+(0.35*5*cos(car_angle*M_PI/180));
+	cam2_pos[5]=transformer_position[2]+(0.35*5*sin(car_angle*M_PI/180));
 
-
-}
-
-void mulMatrix(GLfloat* matrix){
-
-	for(int k=0;k<2;k++){
-		float temp1[4]={0,0,0,0},temp2[4]={0,0,0,0};
-		for(int j=0;j<4;j++){
-			for(int i=0;i<4;i++){
-				if(i!=3){
-					temp1[j]+=cam3_pos[i+k*3]*matrix[4*i+j];
-					temp2[j]+=cam2_pos[i+k*3]*matrix[4*i+j];
-				}
-				else{
-					temp1[j]+=matrix[4*i+j];
-					temp2[j]+=matrix[4*i+j];
-				}
-			}
-		}
-		for(int i=0;i<3;i++){
-			cam3_pos[i+k*3]=temp1[i]/temp1[3];
-			cam2_pos[i+k*3]=temp2[i]/temp2[3];
-		}
-	}
-
-}
-
-bool gluInvertMatrix(GLfloat* m, GLfloat* invOut){
-	double inv[16], det;
-	int i;
-
-	inv[0] = m[5]  * m[10] * m[15] - 
-	m[5]  * m[11] * m[14] - 
-	m[9]  * m[6]  * m[15] + 
-	m[9]  * m[7]  * m[14] +
-	m[13] * m[6]  * m[11] - 
-	m[13] * m[7]  * m[10];
-
-	inv[4] = -m[4]  * m[10] * m[15] + 
-	m[4]  * m[11] * m[14] + 
-	m[8]  * m[6]  * m[15] - 
-	m[8]  * m[7]  * m[14] - 
-	m[12] * m[6]  * m[11] + 
-	m[12] * m[7]  * m[10];
-
-	inv[8] = m[4]  * m[9] * m[15] - 
-	m[4]  * m[11] * m[13] - 
-	m[8]  * m[5] * m[15] + 
-	m[8]  * m[7] * m[13] + 
-	m[12] * m[5] * m[11] - 
-	m[12] * m[7] * m[9];
-
-	inv[12] = -m[4]  * m[9] * m[14] + 
-	m[4]  * m[10] * m[13] +
-	m[8]  * m[5] * m[14] - 
-	m[8]  * m[6] * m[13] - 
-	m[12] * m[5] * m[10] + 
-	m[12] * m[6] * m[9];
-
-	inv[1] = -m[1]  * m[10] * m[15] + 
-	m[1]  * m[11] * m[14] + 
-	m[9]  * m[2] * m[15] - 
-	m[9]  * m[3] * m[14] - 
-	m[13] * m[2] * m[11] + 
-	m[13] * m[3] * m[10];
-
-	inv[5] = m[0]  * m[10] * m[15] - 
-	m[0]  * m[11] * m[14] - 
-	m[8]  * m[2] * m[15] + 
-	m[8]  * m[3] * m[14] + 
-	m[12] * m[2] * m[11] - 
-	m[12] * m[3] * m[10];
-
-	inv[9] = -m[0]  * m[9] * m[15] + 
-	m[0]  * m[11] * m[13] + 
-	m[8]  * m[1] * m[15] - 
-	m[8]  * m[3] * m[13] - 
-	m[12] * m[1] * m[11] + 
-	m[12] * m[3] * m[9];
-
-	inv[13] = m[0]  * m[9] * m[14] - 
-	m[0]  * m[10] * m[13] - 
-	m[8]  * m[1] * m[14] + 
-	m[8]  * m[2] * m[13] + 
-	m[12] * m[1] * m[10] - 
-	m[12] * m[2] * m[9];
-
-	inv[2] = m[1]  * m[6] * m[15] - 
-	m[1]  * m[7] * m[14] - 
-	m[5]  * m[2] * m[15] + 
-	m[5]  * m[3] * m[14] + 
-	m[13] * m[2] * m[7] - 
-	m[13] * m[3] * m[6];
-
-	inv[6] = -m[0]  * m[6] * m[15] + 
-	m[0]  * m[7] * m[14] + 
-	m[4]  * m[2] * m[15] - 
-	m[4]  * m[3] * m[14] - 
-	m[12] * m[2] * m[7] + 
-	m[12] * m[3] * m[6];
-
-	inv[10] = m[0]  * m[5] * m[15] - 
-	m[0]  * m[7] * m[13] - 
-	m[4]  * m[1] * m[15] + 
-	m[4]  * m[3] * m[13] + 
-	m[12] * m[1] * m[7] - 
-	m[12] * m[3] * m[5];
-
-	inv[14] = -m[0]  * m[5] * m[14] + 
-	m[0]  * m[6] * m[13] + 
-	m[4]  * m[1] * m[14] - 
-	m[4]  * m[2] * m[13] - 
-	m[12] * m[1] * m[6] + 
-	m[12] * m[2] * m[5];
-
-	inv[3] = -m[1] * m[6] * m[11] + 
-	m[1] * m[7] * m[10] + 
-	m[5] * m[2] * m[11] - 
-	m[5] * m[3] * m[10] - 
-	m[9] * m[2] * m[7] + 
-	m[9] * m[3] * m[6];
-
-	inv[7] = m[0] * m[6] * m[11] - 
-	m[0] * m[7] * m[10] - 
-	m[4] * m[2] * m[11] + 
-	m[4] * m[3] * m[10] + 
-	m[8] * m[2] * m[7] - 
-	m[8] * m[3] * m[6];
-
-	inv[11] = -m[0] * m[5] * m[11] + 
-	m[0] * m[7] * m[9] + 
-	m[4] * m[1] * m[11] - 
-	m[4] * m[3] * m[9] - 
-	m[8] * m[1] * m[7] + 
-	m[8] * m[3] * m[5];
-
-	inv[15] = m[0] * m[5] * m[10] - 
-	m[0] * m[6] * m[9] - 
-	m[4] * m[1] * m[10] + 
-	m[4] * m[2] * m[9] + 
-	m[8] * m[1] * m[6] - 
-	m[8] * m[2] * m[5];
-	det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
-
-	if (det == 0)
-		return false;
-
-	det = 1.0 / det;
-
-	for (i = 0; i < 16; i++)
-		invOut[i] = inv[i] * det;
-
-	return true;
-}
-
-void load_default_cam(){
-	if(cam_num!=1){
-		glLoadIdentity();
-		gluLookAt(cs475::current_cam_pos[0],cs475::current_cam_pos[1],cs475::current_cam_pos[2],
-			cs475::current_cam_pos[3],cs475::current_cam_pos[4],cs475::current_cam_pos[5],
-			cs475::current_cam_pos[6],cs475::current_cam_pos[7],cs475::current_cam_pos[8]);
-
-		GLfloat matrix[16]; 
-		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		GLfloat out[16];
-
-		gluInvertMatrix(matrix,out);
-
-		mulMatrix(out);
-
-	}
+	cam3_pos[0]=transformer_position[0]+(0.35*5*cos(car_angle*M_PI/180))+cam3_z*sin(car_angle*M_PI/180);
+	cam3_pos[2]=transformer_position[2]-(0.35*5*sin(car_angle*M_PI/180))+cam3_z*cos(car_angle*M_PI/180);
+	cam3_pos[3]=transformer_position[0]+(0.35*5*cos(car_angle*M_PI/180))+(cam3_z+1)*sin(car_angle*M_PI/180);
+	cam3_pos[5]=transformer_position[2]-(0.35*5*sin(car_angle*M_PI/180))+(cam3_z+1)*cos(car_angle*M_PI/180);
 
 	switch(cam_num){
-		case 1: std::copy(cam1_pos,cam1_pos+9,current_cam_pos); break;
-		case 2: std::copy(cam2_pos,cam2_pos+9,current_cam_pos); break;
-		case 3: std::copy(cam3_pos,cam3_pos+9,current_cam_pos); break;
+		case 1: copy(cam1_pos,current_cam_pos); break;
+		case 2: copy(cam2_pos,current_cam_pos); break;
+		case 3: copy(cam3_pos,current_cam_pos); break;
 	}
-
 }
+
+
 
 void copy(float* src,float*dst){
 	for(int i=0;i<9;i++) dst[i]=src[i];
@@ -315,12 +171,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 	double aspect;
 	if (width > height){
 		aspect = (double)width/(double)height;
-		gluPerspective(50, aspect, 1, 5000);
+		gluPerspective(40, aspect, 1, 5000);
 	}
 
 	else{
 		aspect = (double)height/(double)width;
-		gluPerspective(50, aspect, 1, 5000);
+		gluPerspective(40, aspect, 1, 5000);
 	}
 
 	win_width = width;
@@ -337,11 +193,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
 // press=false;
 //!Close the window if the ESC key was pressed
-	if (key == GLFW_KEY_ESCAPE )
+	if (key == GLFW_KEY_ESCAPE ){
 		glfwSetWindowShouldClose(window, GL_TRUE);
+		myfile.close();
+	}
+	
 
 //  Right arrow , left arrow rotates transformer along y-axis 5 degrees anti-clockwise and 
 // clockwise respectively
+	if(key==GLFW_KEY_F && action==GLFW_PRESS && record){
+		cout << "writing to file" << endl;
+		myfile << transformer_position[0] << " " << transformer_position[1] << " " << transformer_position[2] << std::endl;
+	}
 	if(key== GLFW_KEY_RIGHT && action==GLFW_RELEASE){
 		tyre_angle=0;
 	}
@@ -351,13 +214,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	}
 	if(key== GLFW_KEY_RIGHT ){
-		forward+=direction*0.01;
 		car_angle-=0.5;
+
 		if(tyre_angle>-3) tyre_angle-=0.5/2;
 
 	} 
 	if(key == GLFW_KEY_LEFT ){
-		forward+=direction*0.01;
+		
 		car_angle+=0.5;
 		if(tyre_angle<3)tyre_angle+=0.5/2;
 
@@ -367,12 +230,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // anti-clockwise respectively
 
 	if(key==GLFW_KEY_UP ){
-		direction=1;
-		forward+=0.1;
+		 if(toCar) vehicle_mode=true;
+		if(toCar)forward+=0.1;
+		if(vehicle_mode){
+			transformer_position[0]+=forward*sin(car_angle*M_PI/180);
+			transformer_position[2]+=forward*cos(car_angle*M_PI/180);
+		}
 	} 
 	else if(key==GLFW_KEY_DOWN ){
-		direction=-1;
-		forward-=0.1;
+		 if(toCar) vehicle_mode=true;
+		if(toCar) forward-=0.1;
+		if(vehicle_mode){
+			transformer_position[0]-=forward*sin(car_angle*M_PI/180);
+			transformer_position[2]-=forward*cos(car_angle*M_PI/180);
+		}
 	} 
 
 // toggle the direction of rotation
@@ -420,22 +291,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if(key==GLFW_KEY_C &&  action == GLFW_PRESS){
 
-		glLoadIdentity();
-		gluLookAt(cs475::current_cam_pos[0],cs475::current_cam_pos[1],cs475::current_cam_pos[2],
-			cs475::current_cam_pos[3],cs475::current_cam_pos[4],cs475::current_cam_pos[5],
-			cs475::current_cam_pos[6],cs475::current_cam_pos[7],cs475::current_cam_pos[8]);
-
-		GLfloat matrix[16]; 
-		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		GLfloat out[16];
-
-		gluInvertMatrix(matrix,out);
-
-		mulMatrix(out);
 		switch(cam_num){
-			case 1: copy(cam2_pos,current_cam_pos); cam_num+=1;break;
-			case 2: copy(cam3_pos,current_cam_pos); cam_num+=1;break;
-			case 3: copy(cam1_pos,current_cam_pos); cam_num=1;break;
+			case 1:  cam_num+=1;break;
+			case 2:  cam_num+=1;break;
+			case 3:  cam_num=1;break;
 		}
 	}
 
@@ -470,7 +329,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 				spot_light1=false;
 			}
 			else {
-				std::cout << "entered" << std::endl;
 				glEnable(GL_LIGHT2);
 				spot_light1=true;
 			}
@@ -489,8 +347,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	
 
-	if(key==GLFW_KEY_1) first=!first;
-	if(key==GLFW_KEY_2) second=!second;
+	if(key==GLFW_KEY_1 && action==GLFW_PRESS){
+		first=!first;
+	}
+	if(key==GLFW_KEY_2 && action==GLFW_PRESS) second=!second;
 
 
 
@@ -500,20 +360,37 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 
-	if(key==GLFW_KEY_R ){
-		reset();
+	if(key==GLFW_KEY_R && action==GLFW_PRESS){
+		// reset();
+		if(!record) cout << "recording to file\n";
+		else cout << "not recording\n";
+		record=!record;
+		return;
+
+	}
+
+	if(key==GLFW_KEY_P && action==GLFW_PRESS){
+		if(!playback) cout << "playback mode is on\n";
+		else cout << "playback mode is off\n";
+		playback=!playback;
+		return;
+	}
+
+	if(key==GLFW_KEY_A && action==GLFW_PRESS){
+		cam_angle-=0.5;
+
 	}
 
 
-
 	if(key==GLFW_KEY_S  && mods==GLFW_MOD_SHIFT){
+
 		if(first){
 			if(!space_press && left_shoulder_x<=90-step) left_shoulder_x+=step;
-			else if(space_press && left_shoulder_x>=step) left_shoulder_x-=step;
+			else if(space_press && left_shoulder_x>=step-90) left_shoulder_x-=step;
 		}
 		if(second){
 			if(!space_press && right_shoulder_x<=90-step) right_shoulder_x+=step;
-			else if(space_press && right_shoulder_x>=step) right_shoulder_x-=step;
+			else if(space_press && right_shoulder_x>=step-90) right_shoulder_x-=step;
 		}
 	}
 
@@ -538,17 +415,31 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		}
 	}
 
+	if(key==GLFW_KEY_V ){
+		if(space_press){
+			head_angle+=5;
+		}
+		else{
+			head_angle-=5;
+		}
+	}
 
 
 
 
-	if(key==GLFW_KEY_T ){
-		step=0.09;
-		if(!space_press && !toCar){
+	if(key==GLFW_KEY_T && action==GLFW_PRESS){
+		transform=true;
+		if(toCar){
+			toTransformer=true;
+			toCar=false;
+			return;
+		}
+		if(toTransformer){
 			toCar=true;
+			toTransformer=false;
+			return;
 		}
 
-		else if(space_press && !toTransformer) toTransformer=true;
 	}
 
 
@@ -568,7 +459,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 void reset(){
-
+	cout << "entered" << endl;
 	hand_angle=0;
 	space_press=false;
 	right_knee_angle=0;
@@ -595,6 +486,37 @@ void reset(){
 	left_elbow_angle=0;
 	right_elbow_angle=0;
 	close_leg=0;
+
+	
+	transformer_position[0]=-367.761;
+	transformer_position[2]=854.055;
+
+	cam_angle=0;
+	cam2_z=30;
+	cam3_z=3;
+	
+	cam1_pos[0]=-367.761;cam1_pos[2]=50+854.055;cam1_pos[3]=-367.761;cam1_pos[5]=10+854.055;
+
+	cam_num=1;
+
+	forward=0.0;
+	tyre_angle=0;
+	transform=false;
+
+	car_angle=0;
+	light1=true;
+	light2=true;
+	spot_light1=true;
+	spot_light2=true;
+
+	record=false;
+	playback=false;
+
+	vehicle_mode=false;
+
+  	move_foot=0;
+  	head_angle=0;
+
 }
 
 
